@@ -16,7 +16,7 @@
         <field name="match_id" ref="base_import_match.res_partner_vat" />
         <field name="field_id" ref="base.field_res_partner__is_company" />
         <field name="conditional">True</field>
-        <field name="imported_value">True</field>
+        <field name="imported_value">1</field>
     </record>
     <!-- Match users by login -->
     <record model="base_import.match" id="res_users_login">

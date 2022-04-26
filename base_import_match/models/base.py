@@ -19,6 +19,13 @@ class Base(models.AbstractModel):
         if self.env["base_import.match"]._usable_rules(self._name, fields):
             newdata = list()
             # Data conversion to ORM format
+            if ".id" in fields:
+                column = fields.index(".id")
+                fields[column] = "id"
+                # data[0][column] = "id"
+                for values in data:
+                    dbid = int(values[column])
+                    values[column] = self.browse(dbid).get_external_id().get(dbid)
             import_fields = list(map(models.fix_import_export_id_paths, fields))
             converted_data = self._convert_records(
                 self._extract_records(import_fields, data)

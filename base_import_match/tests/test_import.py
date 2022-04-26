@@ -31,24 +31,26 @@ class ImportCase(TransactionCase):
         """Change name based on External ID."""
         deco_addict = self.env.ref("base.res_partner_2")
         record = self._base_import_record("res.partner", "res_partner_external_id")
-        record.do(["id", "vat", "name"], [], OPTIONS)
+        record.execute_import(["id", "vat", "name"], [], OPTIONS)
         deco_addict.env.cache.invalidate()
         self.assertEqual(deco_addict.name, "Deco Addict External ID Changed")
 
     def test_res_partner_dbid(self):
         """Change name based on DB ID."""
         deco_addict = self.env.ref("base.res_partner_2")
+        gemini = self.env.ref("base.res_partner_3")
         record = self._base_import_record("res.partner", "res_partner_dbid")
-        record.do([".id", "vat", "name"], [], OPTIONS)
+        record.execute_import([".id", "vat", "name"], [], OPTIONS)
         deco_addict.env.cache.invalidate()
         self.assertEqual(deco_addict.name, "Deco Addict External DBID Changed")
+        self.assertEqual(gemini.name, "Gemini Furniture External DBID Changed")
 
     def test_res_partner_vat(self):
         """Change name based on VAT."""
         deco_addict = self.env.ref("base.res_partner_2")
         deco_addict.vat = "BE0477472701"
         record = self._base_import_record("res.partner", "res_partner_vat")
-        record.do(["name", "vat", "is_company"], [], OPTIONS)
+        record.execute_import(["name", "vat", "is_company"], [], OPTIONS)
         deco_addict.env.cache.invalidate()
         self.assertEqual(deco_addict.name, "Deco Addict Changed")
 
@@ -59,7 +61,7 @@ class ImportCase(TransactionCase):
         record = self._base_import_record(
             "res.partner", "res_partner_invalid_combination_vat"
         )
-        record.do(["name", "vat", "is_company"], [], OPTIONS)
+        record.execute_import(["name", "vat", "is_company"], [], OPTIONS)
         deco_addict.env.cache.invalidate()
         self.assertEqual(deco_addict.name, deco_addict.name)
 
@@ -68,40 +70,40 @@ class ImportCase(TransactionCase):
         record = self._base_import_record(
             "res.partner", "res_partner_parent_name_is_company"
         )
-        record.do(["name", "is_company", "parent_id/id", "email"], [], OPTIONS)
+        record.execute_import(["name", "is_company", "parent_id/id", "email"], [], OPTIONS)
         self.assertEqual(
-            self.env.ref("base.res_partner_address_4").email,
-            "floyd.steward34.changed@example.com",
+            self.env.ref("base.res_partner_address_3").email,
+            "douglas.fletcher.changed@example.com",
         )
 
     def test_res_partner_email(self):
         """Change name based on email."""
         record = self._base_import_record("res.partner", "res_partner_email")
-        record.do(["email", "name"], [], OPTIONS)
+        record.execute_import(["email", "name"], [], OPTIONS)
         self.assertEqual(
-            self.env.ref("base.res_partner_address_4").name, "Floyd Steward Changed"
+            self.env.ref("base.res_partner_address_3").name, "Douglas Fletcher Changed"
         )
 
     def test_res_partner_name(self):
         """Change function based on name."""
         record = self._base_import_record("res.partner", "res_partner_name")
-        record.do(["function", "name"], [], OPTIONS)
+        record.execute_import(["function", "name"], [], OPTIONS)
         self.assertEqual(
-            self.env.ref("base.res_partner_address_4").function, "Function Changed"
+            self.env.ref("base.res_partner_address_3").function, "Function Changed"
         )
 
     def test_res_partner_name_duplicated(self):
         """Change function based on name."""
         record = self._base_import_record("res.partner", "res_partner_name")
-        partner_1 = self.env.ref("base.res_partner_address_4")
+        partner_1 = self.env.ref("base.res_partner_address_3")
         partner_2 = self.env.ref("base.res_partner_2")
         function = partner_1.function
         partner_2.name = partner_1.name
-        record.do(["function", "name"], [], OPTIONS)
-        self.assertEqual(self.env.ref("base.res_partner_address_4").function, function)
+        record.execute_import(["function", "name"], [], OPTIONS)
+        self.assertEqual(self.env.ref("base.res_partner_address_3").function, function)
 
     def test_res_users_login(self):
         """Change name based on login."""
         record = self._base_import_record("res.users", "res_users_login")
-        record.do(["login", "name"], [], OPTIONS)
+        record.execute_import(["login", "name"], [], OPTIONS)
         self.assertEqual(self.env.ref("base.user_demo").name, "Demo User Changed")
